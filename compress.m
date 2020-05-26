@@ -1,16 +1,37 @@
-% compress: comprime um imagem
-% cupcake: largura = 754 ≃ 745 px
-%          altura = 746 ≃ 745 px
+% compress: comprime uma imagem mxn
 
 function compress (originalImg, k)
   
-  % lendo a imagem
-  I = imread (originalImg, "PixelRegion", {[0 746],[0 746]});
-
-  p = 745; % pixels da imagem do cupcake
-  n = floor ((p + k) / (k + 1)) % imagem comprimida será n x n
+  % Checo a quantidade de pixels da imagem
+  #info = imfinfo(originalImg)
   
-  img = eye (n); % imagem comprimida
+  img = imread(originalImg);
+  [img_width, img_height] = size(img);
+  
+  #img_height # mostra valor de altura
+  #img_width  # mostra valor de comprimento
+  
+  if(img_height != img_width)
+   disp("A imagem inserida não é quadrada. Irei torná-la quadrada a partir do menor valor entre comprimento e largura.");
+   
+   if(img_height > img_width)
+    img_p = img_width;
+    img_height = img_width;
+   else
+    img_p = img_height;
+    img_width = img_height;
+   endif
+   
+  else
+   disp("A imagem inserida é válida. Irei torná-la uma matriz.");
+   img_p = img_height;
+  endif
+  
+  n = floor ((img_p + k) / (k + 1)); % imagem comprimida será n x n
+  
+  printf("O valor gerado para n é %d.\n", n);
+  
+  new_img = eye (n); % imagem comprimida
   
   l = 1; % indica a linha na matriz original 
   c = 1; % indica a coluna
@@ -20,7 +41,7 @@ function compress (originalImg, k)
     % percorremos também as colunas dessa nova imagem    
     for j = 1:1:n
       
-      img (i,j) = I(l,c);
+      new_img (i,j) = img(l,c);
       c += k+1; % avançamos para o próximo múltiplo de k+1
       
     endfor
@@ -29,5 +50,9 @@ function compress (originalImg, k)
     c = 1; % voltamos a coluna pro começo
     
   endfor
-  img
+  
+  #new_img # mostra valores da matriz, de 0 a 255
+  #imagesc(new_img);
+  image(new_img);
+   
 endfunction
