@@ -2,10 +2,11 @@
 
 function compress (originalImg, k)
   
-  % Checo a quantidade de pixels da imagem
-  #info = imfinfo(originalImg)
+  # Para receber o colormap exato da imagem:
+  # uso o imread, recebendo o cmap e img
+  [img, cmap] = imread(originalImg);
   
-  img = imread(originalImg);
+  # Tamanho da imagem
   [img_width, img_height] = size(img);
   
   #img_height # mostra valor de altura
@@ -52,7 +53,9 @@ function compress (originalImg, k)
   endfor
   
   #new_img # mostra valores da matriz, de 0 a 255
-  #imagesc(new_img);
-  image(new_img);
+  imshow(new_img, cmap);
+  #image(new_img);
+  
+  imwrite(new_img, cmap, 'new.png');
    
 endfunction
