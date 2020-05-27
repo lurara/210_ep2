@@ -1,4 +1,4 @@
-% compress: comprime uma imagem mxn
+% compress: comprime uma imagem mxn que torna-se pxp
 
 function compress (originalImg, k)
   
