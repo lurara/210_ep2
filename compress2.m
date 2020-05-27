@@ -140,6 +140,6 @@ function compress2 (originalImg, k)
   #iscolormap(cmap)
   #new_img # mostra valores da matriz, de 0 a 255
   imshow(new_img, myColorMap);
- imwrite(new_img, myColorMap, 'new.png'); 
+  imwrite(new_img, 'new.png'); 
    
 endfunction
