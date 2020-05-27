@@ -36,7 +36,36 @@ function decompress(compressedImg, method, k, h)
     # Desta forma, a matriz resultante possui, nos k espaços
     # entre as linhas e colunas originais, 0s como elementos
     
-    imshow(new_img, cmap);
+    #imshow(new_img, cmap);
+    
+    # Agora falta interpolar os pontos entre (i,j)
+    
+    switch(method)
+      case 1 # Bilinear
+        disp("Método 1: Interpolação bilinear ");
+        
+        rgb = img;
+        
+        RED = rgb(:,:,1);
+        imshow(RED);
+        
+        
+        #(xi, yj ), tal que
+        # xi = x + ih, x E R
+        # yj = y + jh, y E R
+        
+        #(x, y) = (x0, y0) canto inferior esquerdo
+        # (x+(p−1)h, y+(p−1)h) = (xp-1, yp-1) canto superior direito
+        
+        # Portanto, o h deve dividir o número de pixels total
+        
+        
+      case 2 # Bicúbico
+        disp("Método 2: Interpolação bicúbica ");
+      otherwise # ??
+        disp("Método inválido...");
+    endswitch
+        
     
   else
     disp("A imagem inserida não é quadrada. Por favor insira uma imagem nxn.");

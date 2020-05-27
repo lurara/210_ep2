@@ -5,12 +5,31 @@ function compress (originalImg, k)
   # Para receber o colormap exato da imagem:
   # uso o imread, recebendo o cmap e img
   [img, cmap] = imread(originalImg);
+  #imfinfo(originalImg)
   
   # Tamanho da imagem
-  [img_width, img_height] = size(img);
+  [img_width, img_height, num] = size(img);
   
-  #img_height # mostra valor de altura
-  #img_width  # mostra valor de comprimento
+  
+  # O tratamento de imagens RGB é
+  # diferente do tratamento para
+  # imagens que não o são.
+  if( num == 3)
+    disp("A imagem é RGB!");
+    RED = img(:,:,1); # Red
+    GREEN = img(:,:,2); # Green
+    BLUE = img(:,:,3); # Blue
+    
+  else
+    disp("A imagem não é RGB!");
+  endif
+  
+  # Setando o colormap para RGB!
+  numberOfRows = 256; 
+  myColorMap = jet(numberOfRows);
+  
+  img_height # mostra valor de altura
+  img_width  # mostra valor de comprimento
   
   if(img_height != img_width)
    disp("A imagem inserida não é quadrada. Irei torná-la quadrada a partir do menor valor entre comprimento e largura.");
@@ -51,11 +70,9 @@ function compress (originalImg, k)
     c = 1; % voltamos a coluna pro começo
     
   endfor
-  
+  #iscolormap(cmap)
   #new_img # mostra valores da matriz, de 0 a 255
-  imshow(new_img, cmap);
-  #image(new_img);
-  
-  imwrite(new_img, cmap, 'new.png');
+  imshow(new_img, myColorMap);  
+  imwrite(new_img, myColorMap, 'new.png'); 
    
 endfunction
