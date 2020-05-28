@@ -16,6 +16,7 @@ function decompress(compressedImg, method, k, h)
     p = n + (n-1)*k;
     printf("O valor gerado para p é %d.\n", p);
     
+    #{
     new_img = zeros(p, 'uint8');
     
     # Lógica análoga à do programa anterior
@@ -32,6 +33,8 @@ function decompress(compressedImg, method, k, h)
       c = 1;
     endfor
     
+    #}
+    
     # Desta forma, a matriz resultante possui 0s como elementos nos k espaços 
     # entre as linhas e colunas originais.
     
@@ -42,7 +45,7 @@ function decompress(compressedImg, method, k, h)
       case 1 # Bilinear
         disp("Método 1: Interpolação bilinear ");
         # Criação das matrizes contendo valores das componentes RGB
-        imshow(new_img); % isto será retirado dps
+        #imshow(new_img); % isto será retirado dps
         
         # Conceder valor para eles nas respectivas posições
         RED = img(:,:,1);     # Red (n pixels)
@@ -110,13 +113,15 @@ function decompress(compressedImg, method, k, h)
         
         l = c = 1;
         
-        coef = [1, 1, 1, 1];
+        coef = [-1, 1, 1, 1];
         
         #iteração 1 por fora
         
-        for i = 1:1:n       # existem k elementos entre cada um dos i
+        i = 1;
+        j = 1;
+        #for i = 1:1:n-1       # existem k elementos entre cada um dos i
             # acho que so vai até n-1 se n != 1
-            for j = 1:1:n   # existem k elementos entre cada um dos j
+            #for j = 1:1:n-1   # existem k elementos entre cada um dos j
               # acho que so vai até n-1 se n != 1
               
               # A partir daqui vou iterar para cada quadrado
@@ -126,31 +131,55 @@ function decompress(compressedImg, method, k, h)
               # porque essa já vai ter sido interpolada anteriormente
               
               % OBS PRECISO CHECAR SE i+1 SE ENCONTRA NO INTERVALO
-              coef(1) = RED( i, j );      # canto esquerdo superior
-              coef(2) = RED( i, j+1 );    # canto direito superior 
-              coef(3) = RED( i+1, j );    # canto esquerdo inferior
-              coef(4) = RED( i+1, j+1 );  # canto direito inferior
+              coef(1) = double (RED(i, j));                    # canto esquerdo superior
+              # a0 = f(xi,yj)
+              coef(2) = (double (RED( i, j+1 )) - coef(1));                  # canto direito superior 
+              # a0 + a1h = f(xi, yj+1)
+              # a1h = f(xi,yj+1) - a0
+              coef(3) = (double (RED( i+1, j )) - coef(1));                 # canto esquerdo inferior
+              # a0 + a2h = f(xi+1,yj)
+              # a2h = f(xi+1,yj) - a0
+              coef(4) = (double (RED(i+1,j+1)) - coef(1) - coef(2) - coef(3))/(h*h);                # canto direito inferior
+              # a0 + a1h + a2h + a3h^2 = f(xi+1,yi+1)
+              # a3h² = f(xi+1,yi+1) - ao - a1h - a2h
+              # a3   = (f(xi+1,yi+1) - ao - a1h - a2h)/h²
+              
+              # Acertando valor
+              coef(2) /= h;
+              coef(3) /= h;
               
               dist_x = h/(k+1);
-              x = i;
+              x = i*h;
               dist_y = h/(k+1);
-              y = j;
+              y = j*h;
+              
+              #input("ENTER")
               
               # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
               for itr_i = i:1:i+k+1
                 for itr_j = j:1:j+k+1
                   if(new_R(itr_i,itr_j) == 0 ) # só interpolo  valores que n est
+                    #printf("(%d,%d): ", itr_i, itr_j);
                     %%%%INTERPOALAÇÃOOOOOOO%%%%%
+                    new_R(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h)+ coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
+                    #f(x, y) ≈ pij (x, y) = a0 + a1(x − xi) + a2(y − yj ) + a3(x − xi)(y − yj )
+                    #printf(" %d ", new_R(itr_i,itr_j));
                   endif
                   y += dist_y;
                 endfor
                x += dist_x;
+               #disp("\n");
+               y = j*h;
               endfor
               
+              #disp("\n");
               
-              
-            endfor
-        endfor
+            #endfor
+        #endfor
+        
+        new_R
+        imshow(new_R);
+        
         
         #(xi, yj ), tal que
         # xi = x + ih, x E R
