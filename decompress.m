@@ -8,6 +8,7 @@ function decompress(compressedImg, method, k, h)
   # Tamanho da imagem
   [img_width, img_height, num] = size(img); 
   
+  imshow(img);
   # Requisito para rodar esta função:
   if(img_width == img_height)
     n = img_height;
@@ -15,25 +16,6 @@ function decompress(compressedImg, method, k, h)
     # Novo número de pixels de linhas/colunas
     p = n + (n-1)*k;
     printf("O valor gerado para p é %d.\n", p);
-    
-    #{
-    new_img = zeros(p, 'uint8');
-    
-    # Lógica análoga à do programa anterior
-    # irei retirar o código abaixo, porque nçao vou usar
-    l = c = 1;
-    
-    for i = 1:1:n
-      for j = 1:1:n
-        new_img (l,c) = img(i,j);
-        c += k+1;
-      endfor
-      
-      l += k+1;
-      c = 1;
-    endfor
-    
-    #}
     
     # Desta forma, a matriz resultante possui 0s como elementos nos k espaços 
     # entre as linhas e colunas originais.
@@ -51,6 +33,7 @@ function decompress(compressedImg, method, k, h)
         RED = img(:,:,1);     # Red (n pixels)
         GREEN = img(:,:,2);   # Green (n pixels)
         BLUE = img(:,:,3);    # Blue (n pixels)
+        
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         new_R = zeros(p, 'uint8');
@@ -109,19 +92,13 @@ function decompress(compressedImg, method, k, h)
         # Para cada uma dessas iterações, o que vou fazer é interpolar para cada
         # conjunto de quadrados. Dessa forma, 
         
-        q = 1;
-        
         l = c = 1;
         
         coef = [-1, 1, 1, 1];
         
-        #iteração 1 por fora
-        
-        i = 1;
-        j = 1;
-        #for i = 1:1:n-1       # existem k elementos entre cada um dos i
+        for i = 1:1:n-1       # existem k elementos entre cada um dos i
             # acho que so vai até n-1 se n != 1
-            #for j = 1:1:n-1   # existem k elementos entre cada um dos j
+            for j = 1:1:n-1   # existem k elementos entre cada um dos j
               # acho que so vai até n-1 se n != 1
               
               # A partir daqui vou iterar para cada quadrado
@@ -154,11 +131,20 @@ function decompress(compressedImg, method, k, h)
               y = j*h;
               
               #input("ENTER")
+              # 1 + 0k = 1
+              # 2 +1k = 5
+              # 3 +2k = 9
+              # 4 +3k = 13
+              
+              itr_i = i + (i-1)*k;
+              itr_j = j + (j-1)*k;
               
               # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
-              for itr_i = i:1:i+k+1
-                for itr_j = j:1:j+k+1
-                  if(new_R(itr_i,itr_j) == 0 ) # só interpolo  valores que n est
+              #for itr_i = i:1:i+k+1
+              for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
+                #for itr_j = j:1:j+k+1
+                 for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
+                  if(new_R(itr_i,itr_j) == 0 ) # só interpolo  valores que n estão >>>>>>>>>> PRECISO MUDAR PROVAVEL MAS ATÉ AHR FUNCIONA
                     #printf("(%d,%d): ", itr_i, itr_j);
                     %%%%INTERPOALAÇÃOOOOOOO%%%%%
                     new_R(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h)+ coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
@@ -173,14 +159,97 @@ function decompress(compressedImg, method, k, h)
               endfor
               
               #disp("\n");
+              #n++;
+            endfor
+        endfor
+        
+        #new_R
+        # GREEN
+        l = c = 1;
+        
+        coef = [-1, 1, 1, 1];
+        
+        for i = 1:1:n-1
+            for j = 1:1:n-1
               
-            #endfor
-        #endfor
+              coef(1) = double (GREEN(i, j));
+              coef(2) = (double (GREEN( i, j+1 )) - coef(1));
+              coef(3) = (double (GREEN( i+1, j )) - coef(1));
+              coef(4) = (double (GREEN(i+1,j+1)) - coef(1) - coef(2) - coef(3))/(h*h);
+              
+              coef(2) /= h;
+              coef(3) /= h;
+              
+              dist_x = h/(k+1);
+              x = i*h;
+              dist_y = h/(k+1);
+              y = j*h;
+              
+              itr_i = i + (i-1)*k;
+              itr_j = j + (j-1)*k;
+              
+              for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
+                 for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
+                  if(new_G(itr_i,itr_j) == 0 )
+                    new_G(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h)+ coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
+                  endif
+                  y += dist_y;
+                  
+                endfor
+               x += dist_x;
+               y = j*h;
+               
+              endfor
+            endfor
+        endfor
         
-        new_R
-        imshow(new_R);
+        # BLUE
+        l = c = 1;
         
+        coef = [-1, 1, 1, 1];
         
+        for i = 1:1:n-1
+            for j = 1:1:n-1
+              
+              coef(1) = double (BLUE(i, j));
+              coef(2) = (double (BLUE( i, j+1 )) - coef(1));
+              coef(3) = (double (BLUE( i+1, j )) - coef(1));
+              coef(4) = (double (BLUE(i+1,j+1)) - coef(1) - coef(2) - coef(3))/(h*h);
+              
+              coef(2) /= h;
+              coef(3) /= h;
+              
+              dist_x = h/(k+1);
+              x = i*h;
+              dist_y = h/(k+1);
+              y = j*h;
+              
+              itr_i = i + (i-1)*k;
+              itr_j = j + (j-1)*k;
+              
+              for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
+                 for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
+                  if(new_B(itr_i,itr_j) == 0 )
+                    new_B(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h)+ coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
+                  endif
+                  y += dist_y;
+                  
+                endfor
+               x += dist_x;
+               y = j*h;
+               
+              endfor
+            endfor
+        endfor
+        
+        #new_R
+        #imshow(new_B);
+        
+        # Concantenação das matrizes de cores, formando a imagem final
+        new_img = cat(3,new_R,new_G,new_B);
+        
+        imshow(new_img);               % mostrando imagem RGB
+        imwrite(new_img, 'expand.png');   % salvando imagem RGB
         #(xi, yj ), tal que
         # xi = x + ih, x E R
         # yj = y + jh, y E R
