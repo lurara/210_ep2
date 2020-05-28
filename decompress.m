@@ -42,7 +42,7 @@ function decompress(compressedImg, method, k, h)
         
         for i = 1:1:n
           for j = 1:1:n
-            new_R (l,c) = img(i,j);
+            new_R (l,c) = RED(i,j);
             c += k+1;
           endfor
           
@@ -57,7 +57,7 @@ function decompress(compressedImg, method, k, h)
         
         for i = 1:1:n
           for j = 1:1:n
-            new_G (l,c) = img(i,j);
+            new_G (l,c) = GREEN(i,j);
             c += k+1;
           endfor
           
@@ -72,7 +72,7 @@ function decompress(compressedImg, method, k, h)
         
         for i = 1:1:n
           for j = 1:1:n
-            new_B (l,c) = img(i,j);
+            new_B (l,c) = BLUE(i,j);
             c += k+1;
           endfor
           
