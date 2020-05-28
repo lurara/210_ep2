@@ -115,7 +115,7 @@ function compress (originalImg, k)
     new_img = cat(3,R,G,B);
     
     imshow(new_img);               % mostrando imagem RGB
-    imwrite(new_img, 'new.png');   % salvando imagem RGB
+    imwrite(new_img, 'compressed.png');   % salvando imagem RGB
        
   else  % NÃO RGB
        
@@ -137,7 +137,7 @@ function compress (originalImg, k)
       
     endfor
     
-    imwrite(new_img, cmap, 'new.png'); % salvando imagem não RGB
+    imwrite(new_img, cmap, 'compressed.png'); % salvando imagem não RGB
     imshow(new_img, cmap);
   endif
     

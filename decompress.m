@@ -8,7 +8,7 @@ function decompress(compressedImg, method, k, h)
   # Tamanho da imagem
   [img_width, img_height, num] = size(img); 
   
-  imshow(img);
+  #imshow(img);
   # Requisito para rodar esta função:
   if(img_width == img_height)
     n = img_height;
@@ -249,7 +249,7 @@ function decompress(compressedImg, method, k, h)
         new_img = cat(3,new_R,new_G,new_B);
         
         imshow(new_img);               % mostrando imagem RGB
-        imwrite(new_img, 'expand.png');   % salvando imagem RGB
+        imwrite(new_img, 'decompressed.png');   % salvando imagem RGB
         #(xi, yj ), tal que
         # xi = x + ih, x E R
         # yj = y + jh, y E R
