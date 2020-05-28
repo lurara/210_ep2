@@ -103,7 +103,54 @@ function decompress(compressedImg, method, k, h)
         # Ao entrar em cada posição, preciso iterar sobre os pixels dentro desse
         # quadrado, ou seja, de (1,1) até (2+k, 2+k).
         
-        # Para cada uma dessas iterações, 
+        # Para cada uma dessas iterações, o que vou fazer é interpolar para cada
+        # conjunto de quadrados. Dessa forma, 
+        
+        q = 1;
+        
+        l = c = 1;
+        
+        coef = [1, 1, 1, 1];
+        
+        #iteração 1 por fora
+        
+        for i = 1:1:n       # existem k elementos entre cada um dos i
+            # acho que so vai até n-1 se n != 1
+            for j = 1:1:n   # existem k elementos entre cada um dos j
+              # acho que so vai até n-1 se n != 1
+              
+              # A partir daqui vou iterar para cada quadrado
+              # se for o primeiro, o método é diferente
+              # mas nos outros oque vou fazer é interolar
+              # para todos quadrados abaixo da primeira linha do quadrado
+              # porque essa já vai ter sido interpolada anteriormente
+              
+              % OBS PRECISO CHECAR SE i+1 SE ENCONTRA NO INTERVALO
+              coef(1) = RED( i, j );      # canto esquerdo superior
+              coef(2) = RED( i, j+1 );    # canto direito superior 
+              coef(3) = RED( i+1, j );    # canto esquerdo inferior
+              coef(4) = RED( i+1, j+1 );  # canto direito inferior
+              
+              dist_x = h/(k+1);
+              x = i;
+              dist_y = h/(k+1);
+              y = j;
+              
+              # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
+              for itr_i = i:1:i+k+1
+                for itr_j = j:1:j+k+1
+                  if(new_R(itr_i,itr_j) == 0 ) # só interpolo  valores que n est
+                    %%%%INTERPOALAÇÃOOOOOOO%%%%%
+                  endif
+                  y += dist_y;
+                endfor
+               x += dist_x;
+              endfor
+              
+              
+              
+            endfor
+        endfor
         
         #(xi, yj ), tal que
         # xi = x + ih, x E R
