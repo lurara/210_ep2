@@ -6,9 +6,8 @@ function decompress(compressedImg, method, k, h)
   [img, cmap] = imread(compressedImg);
   
   # Tamanho da imagem
-  [img_width, img_height, num] = size(img); 
+  [img_width, img_height, dim] = size(img); 
   
-  #imshow(img);
   # Requisito para rodar esta função:
   if(img_width == img_height)
     n = img_height;
@@ -96,70 +95,48 @@ function decompress(compressedImg, method, k, h)
         coef = [-1, 1, 1, 1];
         
         for i = 1:1:n-1       # existem k elementos entre cada um dos i
-            # acho que so vai até n-1 se n != 1
-            for j = 1:1:n-1   # existem k elementos entre cada um dos j
-              # acho que so vai até n-1 se n != 1
+          for j = 1:1:n-1   # existem k elementos entre cada um dos j
+            
+            # A partir daqui vou iterar para cada quadrado
+            # se for o primeiro, o método é diferente
+            # mas nos outros oque vou fazer é interolar
+            # para todos quadrados abaixo da primeira linha do quadrado
+            # porque essa já vai ter sido interpolada anteriormente
+            
+            % OBS PRECISO CHECAR SE i+1 SE ENCONTRA NO INTERVALO
+            coef(1) = double (RED(i, j));
+            coef(2) = (double (RED( i, j+1 )) - coef(1));
+            coef(3) = (double (RED( i+1, j )) - coef(1));
+            coef(4) = (double (RED(i+1,j+1)) - coef(1) - coef(2) - coef(3))/(h*h);
+            
+            # Acertando valor
+            coef(2) /= h;
+            coef(3) /= h;
+            
+            # Cálculo da posição nos Reais
+            dist_x = h/(k+1);
+            x = i*h;
+            dist_y = h/(k+1);
+            y = j*h;
+            
+            # Equivalência de posição
+            itr_i = i + (i-1)*k;
+            itr_j = j + (j-1)*k;
+            
+            # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
+            for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
+              for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
               
-              # A partir daqui vou iterar para cada quadrado
-              # se for o primeiro, o método é diferente
-              # mas nos outros oque vou fazer é interolar
-              # para todos quadrados abaixo da primeira linha do quadrado
-              # porque essa já vai ter sido interpolada anteriormente
-              
-              % OBS PRECISO CHECAR SE i+1 SE ENCONTRA NO INTERVALO
-              coef(1) = double (RED(i, j));                    # canto esquerdo superior
-              # a0 = f(xi,yj)
-              coef(2) = (double (RED( i, j+1 )) - coef(1));                  # canto direito superior 
-              # a0 + a1h = f(xi, yj+1)
-              # a1h = f(xi,yj+1) - a0
-              coef(3) = (double (RED( i+1, j )) - coef(1));                 # canto esquerdo inferior
-              # a0 + a2h = f(xi+1,yj)
-              # a2h = f(xi+1,yj) - a0
-              coef(4) = (double (RED(i+1,j+1)) - coef(1) - coef(2) - coef(3))/(h*h);                # canto direito inferior
-              # a0 + a1h + a2h + a3h^2 = f(xi+1,yi+1)
-              # a3h² = f(xi+1,yi+1) - ao - a1h - a2h
-              # a3   = (f(xi+1,yi+1) - ao - a1h - a2h)/h²
-              
-              # Acertando valor
-              coef(2) /= h;
-              coef(3) /= h;
-              
-              dist_x = h/(k+1);
-              x = i*h;
-              dist_y = h/(k+1);
-              y = j*h;
-              
-              #input("ENTER")
-              # 1 + 0k = 1
-              # 2 +1k = 5
-              # 3 +2k = 9
-              # 4 +3k = 13
-              
-              itr_i = i + (i-1)*k;
-              itr_j = j + (j-1)*k;
-              
-              # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
-              #for itr_i = i:1:i+k+1
-              for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
-                #for itr_j = j:1:j+k+1
-                 for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
-                  if(new_R(itr_i,itr_j) == 0 ) # só interpolo  valores que n estão >>>>>>>>>> PRECISO MUDAR PROVAVEL MAS ATÉ AHR FUNCIONA
-                    #printf("(%d,%d): ", itr_i, itr_j);
-                    %%%%INTERPOALAÇÃOOOOOOO%%%%%
-                    new_R(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h)+ coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
-                    #f(x, y) ≈ pij (x, y) = a0 + a1(x − xi) + a2(y − yj ) + a3(x − xi)(y − yj )
-                    #printf(" %d ", new_R(itr_i,itr_j));
-                  endif
-                  y += dist_y;
-                endfor
-               x += dist_x;
-               #disp("\n");
-               y = j*h;
+                if(new_R(itr_i,itr_j) == 0 )
+                  new_R(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h) + coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
+                endif                
+                y += dist_y;
+                
               endfor
-              
-              #disp("\n");
-              #n++;
+              x += dist_x;
+              y = j*h;
             endfor
+          endfor
         endfor
         
         #new_R
@@ -241,23 +218,11 @@ function decompress(compressedImg, method, k, h)
             endfor
         endfor
         
-        #new_R
-        #imshow(new_B);
-        
         # Concantenação das matrizes de cores, formando a imagem final
         new_img = cat(3,new_R,new_G,new_B);
         
-        imshow(new_img);               % mostrando imagem RGB
-        imwrite(new_img, 'decompressed.png');   % salvando imagem RGB
-        #(xi, yj ), tal que
-        # xi = x + ih, x E R
-        # yj = y + jh, y E R
-        
-        #(x, y) = (x0, y0) canto inferior esquerdo
-        # (x+(p−1)h, y+(p−1)h) = (xp-1, yp-1) canto superior direito
-        
-        # Portanto, o h deve dividir o número de pixels total
-        
+        imshow(new_img);                        % mostrando imagem RGB
+        imwrite(new_img, 'decompressed.png');   % salvando imagem RGB     
         
       case 2 # Bicúbico
         disp("Método 2: Interpolação bicúbica ");
@@ -277,6 +242,8 @@ function decompress(compressedImg, method, k, h)
         
         coef = [-1, 1, 1, 1];
         
+        
+        
         for i = 1:1:n-1       # existem k elementos entre cada um dos i
             for j = 1:1:n-1   # existem k elementos entre cada um dos j
               
@@ -290,12 +257,11 @@ function decompress(compressedImg, method, k, h)
                 delij = (double (RED(i-1, j+1)) - double(RED(i-1, j-1)))/(2*h);
               endif
               
-              
               # (a23) derivada parcial de y de (i-1, j+1)
               if(i == 1)
                 deliJ = 0;
               elseif(j == n-1)
-                deliJ = (double(RED(i-1,j)) - double(RED(i-1, j-1)))/h;
+                deliJ = (double(RED(i-1,j+1)) - double(RED(i-1, j)))/h;
               else
                 deliJ = (double(RED(i-1, j+2)) - double(RED(i-1, j)))/(2*h);
               endif
@@ -313,7 +279,7 @@ function decompress(compressedImg, method, k, h)
               if(i == n-1)
                 delIJ = 0;
               elseif(j == n-1)
-                delIJ = (double (RED(i+2, j)) - double(RED(i+2, j-1)))/h;
+                delIJ = (double (RED(i+2, j+1)) - double(RED(i+2, j)))/h;
               else
                 delIJ = (double (RED(i+2, j+2)) - double(RED(i+2, j)))/(2*h);
               endif
@@ -330,7 +296,7 @@ function decompress(compressedImg, method, k, h)
               endif
               
               if(j == n-1) # ok
-                a03 = (double(RED(i, j)) - double(RED(i, j-1)))/h;
+                a03 = (double(RED(i, j+1)) - double(RED(i, j)))/h;
               else
                 a03 = (double(RED(i, j+2)) - double(RED(i, j)))/(2*h);
               endif
@@ -345,7 +311,7 @@ function decompress(compressedImg, method, k, h)
               endif
               
               if(j == n-1) # ok
-                a13 = (double(RED(i+1, j)) - double(RED(i+1, j-1)))/h;
+                a13 = (double(RED(i+1, j+1)) - double(RED(i+1, j)))/h;
               else
                 a13 = (double(RED(i+1, j+2)) - double(RED(i+1, j)))/(2*h);
               endif
@@ -366,13 +332,13 @@ function decompress(compressedImg, method, k, h)
               a23 = (a13 - deliJ)/(2*h);
               
               if(i == n-1) # ok
-                a30 = (double (RED(i, j)) - double (RED(i-1, j)))/(h);
+                a30 = (double (RED(i+1, j)) - double (RED(i, j)))/(h);
               else
                 a30 = (double (RED(i+2, j)) - double(RED(i, j)))/(2*h);
               endif
             
               if(i == n-1) # ok
-                a31 = (double (RED(i, j+1)) - double (RED(i-1, j+1)))/(h);
+                a31 = (double (RED(i+1, j+1)) - double (RED(i, j+1)))/(h);
               else
                 a31 = (double (RED(i+2, j+1)) - double (RED(i, j+1)))/(2*h);
               endif
@@ -400,30 +366,25 @@ function decompress(compressedImg, method, k, h)
               itr_j = j + (j-1)*k; # itr_j é o equivalente da posição j calculada na nova matriz
               
               # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
-              #for itr_i = i:1:i+k+1
               for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
-                #for itr_j = j:1:j+k+1
                  for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
-                  if(new_R(itr_i,itr_j) == 0 ) # só interpolo  valores que n estão >>>>>>>>>> PRECISO MUDAR PROVAVEL MAS ATÉ AHR FUNCIONA
-                    #printf("(%d,%d): ", itr_i, itr_j);
-                    %%%%INTERPOALAÇÃOOOOOOO%%%%%
+                  if(new_R(itr_i,itr_j) == 0 )
                     var_x = [1, (x - i*h), (x-i*h)^2, (x-i*h)^3];
                     var_y = [1; (y - j*h); (y-j*h)^2; (y-j*h)^3];
                     aux = var_x *COEF;
                     new_R(itr_i, itr_j) = aux * var_y;
-                    #new_R(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h)+ coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
-                    #f(x, y) ≈ pij (x, y) = a0 + a1(x − xi) + a2(y − yj ) + a3(x − xi)(y − yj )
-                    #printf(" %d ", new_R(itr_i,itr_j));
                   endif
                   y += dist_y;
                  endfor
                 x += dist_x;
-                #disp("\n");
                 y = j*h;
               endfor
-              
             endfor
         endfor
+
+        #imshow(new_R);
+        imwrite(new_R, 'luffyr.png');
+        input("ENTER");
         
         # BLUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
         l = c = 1;
@@ -566,6 +527,9 @@ function decompress(compressedImg, method, k, h)
             endfor
         endfor
         
+        imshow(new_B);
+        input("ENTER");
+        
         # GREEEEEEEEEEEEEEEEEEN
         
         l = c = 1;
@@ -707,6 +671,10 @@ function decompress(compressedImg, method, k, h)
               endfor
             endfor
         endfor
+        
+        imshow(new_G);
+        
+        input("ENTER");
         
         # Concantenação das matrizes de cores, formando a imagem final
         new_img = cat(3,new_R,new_G,new_B);
