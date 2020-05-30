@@ -56,6 +56,13 @@ function compress (originalImg, k)
   endif
   
   n = floor ((img_p + k) / (k + 1)); % imagem comprimida será n x n
+  teto = false;
+  
+  # Condição para pegar a última linha e última coluna 
+  if(n + (n - 1)*k < img_p)
+    n++;  # n teto
+    teto = true;
+  endif
   
   printf("O valor gerado para n é %d.\n", n);
   
@@ -71,48 +78,106 @@ function compress (originalImg, k)
     B = eye(n, 'uint8'); % componente BLUE
     
     # Preciso iterar para cada um dos RED, GREEN e BLUE
+    
+    #obs: se não gostar, é só tirar a condição abaixo:
+    if( teto )
+    
+      for itr = 1:1:3
+        if(itr == 1)
+          aux = RED;
+          new_aux = R;
+        elseif(itr == 2)
+          aux = GREEN;
+          new_aux = G;
+        else # itr == 3
+          aux = BLUE;
+          new_aux = B;
+        endif
+        
+        l = c = 1;
+        
+        for i = 1:1:n-1
+          for j = 1:1:n-1
+            new_aux(i,j) = aux(l,c);
+            c += k+1;
+          endfor
+          l += k+1;
+          c = 1;
+        endfor
+        
+        %%%%% última linha da matriz %%%%%
+        
+        l = c = 1;
+        
+        for i = 1:1:n-1
+          new_aux (i,n) = aux(l,img_p);
+          l += k+1;
+        endfor
+        
+        for j = 1:1:n-1
+          new_aux (n, j) = aux(img_p,c);
+          c += k+1;
+        endfor;
+        
+        new_aux (n,n) = aux (img_p, img_p);
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        # Concatenando cores
+        if(itr == 1)
+          new_img = new_aux;
+        else
+          new_img = cat(3, new_img, new_aux);
+        endif  
+        
+      endfor
+          
+      
+    else # n floor
+      
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      
+      l = c = 1;
+      
+      for i = 1:1:n
+        for j = 1:1:n
+          R (i,j) = RED(l,c);
+          c += k+1;
+        endfor
+        l += k+1;
+        c = 1;
+      endfor
+      
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GREEN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+      
+      l = c = 1;
+    
+      for i = 1:1:n
+        for j = 1:1:n
+          G (i,j) = GREEN(l,c);
+          c += k+1;
+        endfor
+        l += k+1; 
+        c = 1; 
+      endfor
+      
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BLUE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      
+      l = c = 1;
+      
+      for i = 1:1:n
+        for j = 1:1:n
+          B (i,j) = BLUE(l,c);
+          c += k+1;
+        endfor
+        l += k+1;
+        c = 1;
+      endfor
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    l = c = 1;
-    
-    for i = 1:1:n   
-      for j = 1:1:n
-        R (i,j) = RED(l,c);
-        c += k+1;
-      endfor
-      l += k+1;
-      c = 1;
-    endfor
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GREEN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    
-    l = c = 1;
-  
-    for i = 1:1:n
-      for j = 1:1:n
-        G (i,j) = GREEN(l,c);
-        c += k+1;
-      endfor
-      l += k+1; 
-      c = 1; 
-    endfor
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BLUE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    l = c = 1;
-    
-    for i = 1:1:n
-      for j = 1:1:n
-        B (i,j) = BLUE(l,c);
-        c += k+1;
-      endfor
-      l += k+1;
-      c = 1;
-    endfor
-    
-    # Concantenação das matrizes de cores, formando a imagem final
-    new_img = cat(3,R,G,B);
+      # Concantenação das matrizes de cores, formando a imagem final
+      new_img = cat(3,R,G,B);
+      
+    endif    
     
     imshow(new_img);               % mostrando imagem RGB
     imwrite(new_img, 'compressed.png');   % salvando imagem RGB
