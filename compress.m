@@ -179,8 +179,8 @@ function compress (originalImg, k)
       
     endif    
     
-    imshow(new_img);               % mostrando imagem RGB
-    imwrite(new_img, 'compressed.png');   % salvando imagem RGB
+    imshow(new_img);
+    imwrite(new_img, 'compressed.png', 'Quality', 100);
        
   else  % NÃO RGB
        
@@ -202,7 +202,7 @@ function compress (originalImg, k)
       
     endfor
     
-    imwrite(new_img, cmap, 'compressed.png'); % salvando imagem não RGB
+    imwrite(new_img, cmap, 'compressed.png', 'Quality', 100);
     imshow(new_img, cmap);
   endif
     

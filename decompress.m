@@ -28,7 +28,6 @@ function decompress(compressedImg, method, k, h)
       BLUE = img(:,:,3);    # Blue (n pixels)
       
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      #new_R = zeros(p, 'uint8');
       new_R = -1*ones(p);
       
       l = c = 1;
@@ -44,7 +43,6 @@ function decompress(compressedImg, method, k, h)
       endfor
       
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      #new_G = zeros(p, 'uint8');
       new_G = -1*ones(p);
               
       l = c = 1;
@@ -60,7 +58,6 @@ function decompress(compressedImg, method, k, h)
       endfor
       
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      new_B = zeros(p, 'uint8');
       new_B = -1*ones(p);
               
       l = c = 1;
@@ -143,7 +140,6 @@ function decompress(compressedImg, method, k, h)
               for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
                 for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
                 
-                  #if(new_aux(itr_i,itr_j) == 0 ) % <-- isso é pra não calcular nova cor para pixels já visitados
                   if(new_aux(itr_i,itr_j) == -1 ) % <-- isso é pra não calcular nova cor para pixels já visitados
                     new_aux(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h) + coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
                   endif                
@@ -157,20 +153,17 @@ function decompress(compressedImg, method, k, h)
           endfor          
           
           if(itr == 1)
-            #new_img = new_aux;
             new_img = uint8 (new_aux);
           else
-            #new_img = cat(3, new_img, new_aux);
             new_img = cat(3, new_img, uint8 (new_aux));
           endif
           
         endfor
         
-        # Concantenação das matrizes de cores, formando a imagem final
-        #new_img = cat(3,new_R,new_G,new_B);
-        
-        imshow(new_img);                        % mostrando imagem RGB
-        imwrite(new_img, 'decompressed.png');   % salvando imagem RGB     
+        % Mostrando imagem RGB
+        imshow(new_img);
+        % Salvando imagem RGB     
+        imwrite(new_img, 'decompressed.png', 'Quality', 100);
         
       case 2 # Bicúbico
         disp("Método 2: Interpolação bicúbica ");
@@ -204,116 +197,105 @@ function decompress(compressedImg, method, k, h)
               for j = 1:1:n-1   # existem k elementos entre cada um dos j
                 
                 # "Coeficientes" da matriz
-                # (a22) derivada parcial de y de (i-1,j) 
-                if(i == 1)
-                  delij = 0; # ??? sla
-                elseif( j == 1)
-                  delij = (double (aux(i-1, j+1)) - double (aux(i-1,j)))/h;
-                else
-                  delij = (double (aux(i-1, j+1)) - double(aux(i-1, j-1)))/(2*h);
+                # (a22) derivada parcial de y de (i-1,j)
+                if(i != 1)
+                  if(j != 1)
+                    delij = (double (aux(i-1, j+1)) - double(aux(i-1, j-1)))/(2*h);
+                  else
+                    delij = (double (aux(i-1, j+1)) - double(aux(i- 1, j)))/(h);
+                  endif
                 endif
                 
+                
                 # (a23) derivada parcial de y de (i-1, j+1)
-                if(i == 1)
-                  deliJ = 0;
-                elseif(j == n-1)
-                  deliJ = (double(aux(i-1,j+1)) - double(aux(i-1, j)))/h;
-                else
-                  deliJ = (double(aux(i-1, j+2)) - double(aux(i-1, j)))/(2*h);
+                if(i != 1)
+                  if(j != n-1)
+                    deliJ = (double(aux(i-1, j+2)) - double(aux(i-1, j+1)))/(2*h);
+                  else
+                    deliJ = (double(aux(i-1, j+1)) - double(aux(i-1, j)))/(h);
+                  endif
                 endif
                 
                 # (a32) derivada parcial de y de (i+2, j)
-                if(i == n-1)
-                  delIj = 0;
-                elseif(j == 1)
-                  delIj = (double(aux(i+2, j+1)) - double(aux(i+2, j)))/h;
-                else
-                  delIj = (double(aux(i+2, j+1)) - double(aux(i+2, j-1)))/(2*h);
+                if(i != n-1)
+                  if( j != 1)
+                    delIj = (double(aux(i+2, j+1)) - double(aux(i+2, j-1)))/(2*h);
+                  else
+                    delIj = (double(aux(i+2, j+1)) - double(aux(i+2, j)))/h;
+                  endif
                 endif
                 
                 # (a33) derivada parcial de y de (i+2, j+1)
-                if(i == n-1)
-                  delIJ = 0;
-                elseif(j == n-1)
-                  delIJ = (double (aux(i+2, j+1)) - double(aux(i+2, j)))/h;
-                else
-                  delIJ = (double (aux(i+2, j+2)) - double(aux(i+2, j)))/(2*h);
+                if(i != n-1)
+                  if(j != n-1)
+                    delIJ = (double (aux(i+2, j+2)) - double(aux(i+2, j)))/(2*h);
+                  else
+                    delIJ = (double (aux(i+2, j+1)) - double(aux(i+2, j)))/h;
+                  endif
                 endif
               
                 % OBS CASOS ESPECIAIS SÃO AS BORDAS!! CHECAR AS BORDAS!!!
+                # Abaixo, construção dos elementos da matriz:
                 
                 a00 = double (aux(i,j));
                 a01 = double (aux(i, j+1));
-                
-                if(j == 1) # ok
-                  a02 = (double (aux(i, j+1)) - double(aux(i,j)))/h;
-                else
-                  a02 = (double (aux(i, j+1)) - double(aux(i, j-1)))/(2*h);
-                endif
-                
-                if(j == n-1) # ok
-                  a03 = (double(aux(i, j+1)) - double(aux(i, j)))/h;
-                else
-                  a03 = (double(aux(i, j+2)) - double(aux(i, j)))/(2*h);
-                endif
-                
                 a10 = double (aux(i+1, j));
                 a11 = double (aux(i+1, j+1));
                 
-                if(j == 1) # ok
+                if(j == 1) # restrição de borda
+                  a02 = (double (aux(i, j+1)) - double(aux(i,j)))/h;
                   a12 = (double (aux(i+1, j+1)) - double (aux(i+1,j)))/h;
                 else
+                  a02 = (double (aux(i, j+1)) - double(aux(i, j-1)))/(2*h);
                   a12 = (double (aux(i+1, j+1)) - double(aux(i+1, j-1)))/(2*h);
                 endif
                 
-                if(j == n-1) # ok
+                if(j == n-1) # restrição de borda
+                  a03 = (double(aux(i, j+1)) - double(aux(i, j)))/h;
                   a13 = (double(aux(i+1, j+1)) - double(aux(i+1, j)))/h;
                 else
+                  a03 = (double(aux(i, j+2)) - double(aux(i, j)))/(2*h);
                   a13 = (double(aux(i+1, j+2)) - double(aux(i+1, j)))/(2*h);
                 endif
                 
-                if(i == 1)  # ok
+                if(i == 1) # restrição de borda
                   a20 = (double (aux(i+1, j)) - double (aux(i, j)))/(h);
+                  a21 = (double (aux(i+1, j+1)) - double (aux(i, j+1)))/(h);
+                  a22 = (a12 - a02)/h;       
+                  a23 = (a13 - a03)/h;
                 else
                   a20 = ( double (aux(i+1, j)) - double (aux(i-1, j)))/(2*h);
-                endif
-                
-                if(i == 1) # ok
-                  a21 = (double (aux(i+1, j+1)) - double (aux(i, j+1)))/(h);
-                else
                   a21 = (double (aux(i+1, j+1)) - double (aux(i-1, j+1)))/(2*h);
+                  a22 = (a12 - delij)/(2*h);
+                  a23 = (a13 - deliJ)/(2*h);
                 endif
                 
-                a22 = (a12 - delij)/(2*h);
-                a23 = (a13 - deliJ)/(2*h);
-                
-                if(i == n-1) # ok
+                if(i == n-1) # restrição de borda
                   a30 = (double (aux(i+1, j)) - double (aux(i, j)))/(h);
+                  a31 = (double (aux(i+1, j+1)) - double (aux(i, j+1)))/(h);
+                  a32 = (a12 - a02)/h;
+                  a33 = (a13 - a03)/h;
                 else
                   a30 = (double (aux(i+2, j)) - double(aux(i, j)))/(2*h);
-                endif
-              
-                if(i == n-1) # ok
-                  a31 = (double (aux(i+1, j+1)) - double (aux(i, j+1)))/(h);
-                else
                   a31 = (double (aux(i+2, j+1)) - double (aux(i, j+1)))/(2*h);
+                  a32 = (delIj - a02)/(2*h);
+                  a33 = (delIJ - a03)/(2*h);
                 endif
                 
-                a32 = (delIj - a02)/(2*h);
-                a33 = (delIJ - a03)/(2*h);
+                # Construção da matriz de coeficientes:
                 
                 COEF = [ a00, a01, a02, a03;
                          a10, a11, a12, a13;
                          a20, a21, a22, a23;
                          a30, a31, a32, a33 ];
                          
-                COEF = BI*COEF;
-                COEF = COEF*BTI; # encontrando os reais coeficientes
+                COEF = BI*COEF;  # multiplicação pela inversa de B
+                COEF = COEF*BTI; # multiplicação pela inversa da transposta de B
                 
-                dist_x = h/(k+1);
-                x = i*h;
-                dist_y = h/(k+1);
-                y = j*h;
+                dist_x = h/(k+1); # distância em x em equivalente real do pixel
+                x = i*h;          # distância em x em equivalente real de p_i
+                dist_y = h/(k+1); # distância em y em equivalente real do pixel
+                y = j*h;          # distância em y em equivalente real de p_j
                 
                 var_x = [ 1, 1, 1, 1 ];
                 var_y = [ 1; 1; 1; 1 ];
@@ -324,8 +306,7 @@ function decompress(compressedImg, method, k, h)
                 # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
                 for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
                    for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
-                    #if(new_aux(itr_i,itr_j) == 0 )
-                    if(new_aux(itr_i,itr_j) == -1 )
+                    if(new_aux(itr_i,itr_j) == -1 ) # checo se posição visitada
                       var_x = [1, (x - i*h), (x-i*h)^2, (x-i*h)^3];
                       var_y = [1; (y - j*h); (y-j*h)^2; (y-j*h)^3];
                       aux_c = var_x *COEF;
@@ -339,18 +320,19 @@ function decompress(compressedImg, method, k, h)
               endfor
           endfor
           
+          # Construção da imagem RGB
           if(itr == 1)
-            #new_img = new_aux;
             new_img = uint8 (new_aux);
           else
-            #new_img = cat(3, new_img, new_aux);
             new_img = cat(3, new_img, uint8 (new_aux));
           endif
           
         endfor
         
-        imshow(new_img);
-        imwrite(new_img, 'decompressed.png');   % salvando imagem RGB
+        % Mostrando imagem RGB
+        imshow(new_img); 
+        % Salvando imagem RGB
+        imwrite(new_img, 'decompressed.png', 'Quality', 100);
         
       otherwise # ??
         disp("Método inválido...");
