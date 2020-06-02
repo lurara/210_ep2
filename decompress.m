@@ -27,9 +27,9 @@ function decompress(compressedImg, method, k, h)
       GREEN = img(:,:,2);   # Green (n pixels)
       BLUE = img(:,:,3);    # Blue (n pixels)
       
-      
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      new_R = zeros(p, 'uint8');
+      #new_R = zeros(p, 'uint8');
+      new_R = -1*ones(p);
       
       l = c = 1;
       
@@ -44,7 +44,8 @@ function decompress(compressedImg, method, k, h)
       endfor
       
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      new_G = zeros(p, 'uint8');
+      #new_G = zeros(p, 'uint8');
+      new_G = -1*ones(p);
               
       l = c = 1;
       
@@ -60,6 +61,7 @@ function decompress(compressedImg, method, k, h)
       
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%
       new_B = zeros(p, 'uint8');
+      new_B = -1*ones(p);
               
       l = c = 1;
       
@@ -141,7 +143,8 @@ function decompress(compressedImg, method, k, h)
               for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
                 for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
                 
-                  if(new_aux(itr_i,itr_j) == 0 )
+                  #if(new_aux(itr_i,itr_j) == 0 ) % <-- isso é pra não calcular nova cor para pixels já visitados
+                  if(new_aux(itr_i,itr_j) == -1 ) % <-- isso é pra não calcular nova cor para pixels já visitados
                     new_aux(itr_i,itr_j) = coef(1) + coef(3)*(x-i*h) + coef(2)*(y-j*h) + coef(4)*(x-i*h)*(y-j*h);
                   endif                
                   y += dist_y;
@@ -154,9 +157,11 @@ function decompress(compressedImg, method, k, h)
           endfor          
           
           if(itr == 1)
-            new_img = new_aux;
+            #new_img = new_aux;
+            new_img = uint8 (new_aux);
           else
-            new_img = cat(3, new_img, new_aux);
+            #new_img = cat(3, new_img, new_aux);
+            new_img = cat(3, new_img, uint8 (new_aux));
           endif
           
         endfor
@@ -319,7 +324,8 @@ function decompress(compressedImg, method, k, h)
                 # INÍCIO DA INTERPOLAÇÃO PARA OS (K+2)x(K+2) ELEMENTOS
                 for itr_i = (i + (i-1)*k):1:(i + (i-1)*k)+k+1
                    for itr_j = (j + (j-1)*k):1:(j + (j-1)*k)+k+1
-                    if(new_aux(itr_i,itr_j) == 0 )
+                    #if(new_aux(itr_i,itr_j) == 0 )
+                    if(new_aux(itr_i,itr_j) == -1 )
                       var_x = [1, (x - i*h), (x-i*h)^2, (x-i*h)^3];
                       var_y = [1; (y - j*h); (y-j*h)^2; (y-j*h)^3];
                       aux_c = var_x *COEF;
@@ -334,9 +340,11 @@ function decompress(compressedImg, method, k, h)
           endfor
           
           if(itr == 1)
-            new_img = new_aux;
+            #new_img = new_aux;
+            new_img = uint8 (new_aux);
           else
-            new_img = cat(3, new_img, new_aux);
+            #new_img = cat(3, new_img, new_aux);
+            new_img = cat(3, new_img, uint8 (new_aux));
           endif
           
         endfor
