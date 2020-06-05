@@ -210,7 +210,7 @@ function decompress(compressedImg, method, k, h)
                 # (a23) derivada parcial de y de (i-1, j+1)
                 if(i != 1)
                   if(j != n-1)
-                    deliJ = (double(aux(i-1, j+2)) - double(aux(i-1, j+1)))/(2*h);
+                    deliJ = (double(aux(i-1, j+2)) - double(aux(i-1, j)))/(2*h);
                   else
                     deliJ = (double(aux(i-1, j+1)) - double(aux(i-1, j)))/(h);
                   endif
