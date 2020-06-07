@@ -5,7 +5,14 @@ function calculateError(originalImg, decompressedImg)
   [decompressed] = imread(decompressedImg);
   
   # Tamanho das imagens
-  [org_size, org_height, dim] = size(original);
+  [org_width, org_height, dim] = size(original);
+  if(org_width > org_height)
+    org_size = org_height;
+  else
+    org_size = org_width;
+  endif
+  
+  % Não é necessário checar pois decompressed é quadrada
   [dec_size, dec_height, dim] = size(decompressed);
     
   # Matrizes RGB
