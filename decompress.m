@@ -22,58 +22,64 @@ function decompress(compressedImg, method, k, h)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Interpolação por partes:
     
-      # Conceder valor para eles nas respectivas posições
-      RED = img(:,:,1);     # Red (n pixels)
-      GREEN = img(:,:,2);   # Green (n pixels)
-      BLUE = img(:,:,3);    # Blue (n pixels)
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      new_R = -1*ones(p);
-      
-      l = c = 1;
-      
-      for i = 1:1:n
-        for j = 1:1:n
-          new_R (l,c) = RED(i,j);
-          c += k+1;
-        endfor
-        
-        l += k+1;
-        c = 1;
-      endfor
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      new_G = -1*ones(p);
-              
-      l = c = 1;
-      
-      for i = 1:1:n
-        for j = 1:1:n
-          new_G (l,c) = GREEN(i,j);
-          c += k+1;
-        endfor
-        
-        l += k+1;
-        c = 1;
-      endfor
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      new_B = -1*ones(p);
-              
-      l = c = 1;
-      
-      for i = 1:1:n
-        for j = 1:1:n
-          new_B (l,c) = BLUE(i,j);
-          c += k+1;
-        endfor
-        
-        l += k+1;
-        c = 1;
-      endfor
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # Conceder valor para eles nas respectivas posições
+    RED = img(:,:,1);     # Red (n pixels)
     
+    if(dim  == 3)
+      GREEN = img(:,:,2);   # Green (n pixels)
+      BLUE = img(:,:,3);    # Blue (n pixels)        
+    endif
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    new_R = -1*ones(p);
+    
+    l = c = 1;
+    
+    for i = 1:1:n
+      for j = 1:1:n
+        new_R (l,c) = RED(i,j);
+        c += k+1;
+      endfor
+      
+      l += k+1;
+      c = 1;
+    endfor
+    
+    if(dim == 3)
+      
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    new_G = -1*ones(p);
+            
+    l = c = 1;
+    
+    for i = 1:1:n
+      for j = 1:1:n
+        new_G (l,c) = GREEN(i,j);
+        c += k+1;
+      endfor
+      
+      l += k+1;
+      c = 1;
+    endfor
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    new_B = -1*ones(p);
+            
+    l = c = 1;
+    
+    for i = 1:1:n
+      for j = 1:1:n
+        new_B (l,c) = BLUE(i,j);
+        c += k+1;
+      endfor
+      
+      l += k+1;
+      c = 1;
+    endfor
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    endif
+      
     switch(method)
       case 1 # Bilinear
         disp("Método 1: Interpolação bilinear ");
