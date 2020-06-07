@@ -59,7 +59,7 @@ function compress (originalImg, k)
   teto = false;
   
   # Condição para pegar a última linha e última coluna 
-  if(n + (n - 1)*k < img_p)
+  if(n + (n - 1)*k < img_p && ehRGB) % SÓ VALE PARA RGB, ARRUMAR DPS
     n++;  # n teto
     teto = true;
   endif
@@ -202,8 +202,14 @@ function compress (originalImg, k)
       
     endfor
     
-    imwrite(new_img, cmap, 'compressed.png', 'Quality', 100);
-    imshow(new_img, cmap);
+    if(iscolormap(cmap))
+      imwrite(new_img, cmap, 'compressed.png', 'Quality', 100);
+      imshow(new_img, cmap);
+    else
+      imwrite(new_img, 'compressed.png', 'Quality', 100);
+      imshow(new_img);  
+    endif
+    
   endif
     
   #new_img # mostra valores da matriz, de 0 a 255
