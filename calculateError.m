@@ -6,12 +6,7 @@ function calculateError(originalImg, decompressedImg)
   
   # Tamanho das imagens
   [org_width, org_height, dim] = size(original);
-  if(org_width > org_height)
-    org_size = org_height;
-  else
-    org_size = org_width;
-  endif
-  
+    
   % Não é necessário checar pois decompressed é quadrada
   [dec_size, dec_height, dim] = size(decompressed);
     
@@ -23,6 +18,32 @@ function calculateError(originalImg, decompressedImg)
   decR = decompressed(:,:,1);
   decG = decompressed(:,:,2);
   decB = decompressed(:,:,3);
+  
+  if(org_width > org_height)
+    org_size = org_height;
+    
+    while(org_width != org_size)
+      origR = origR(1:end-1, 1:end);
+      origG = origG(1:end-1, 1:end);
+      origB = origB(1:end-1, 1:end);
+      
+      [org_width, org_height] = size(origR);
+    
+    endwhile
+    
+  else
+    org_size = org_width;
+    
+    while(org_height != org_size)
+      origR = origR(1:end, 1:end-1);
+      origG = origG(1:end, 1:end-1);
+      origB = origB(1:end, 1:end-1);
+      
+      [org_width, org_height] = size(origR);
+    
+    endwhile
+  
+  endif
   
   if(dec_size > org_size)
     #disp("ENTROU: maior decompressed");
@@ -45,7 +66,8 @@ function calculateError(originalImg, decompressedImg)
       origG = origG(1:end-1, 1:end-1);
       origB = origB(1:end-1, 1:end-1);
       
-      [org_size, org_height] = size(origR);
+      [org_width, org_height] = size(origR);
+      
     endwhile
   endif
   
