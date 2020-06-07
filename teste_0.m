@@ -3,8 +3,8 @@ function teste_0 (p)
   g = ones(p, 'uint8');
   b = ones(p, 'uint8');
   
-  for x = 1:p
-    for y = 1:p
+  for x = 1:1:p
+    for y = 1:1:p
       
       % [-1, 1]
       aux = sin(x);

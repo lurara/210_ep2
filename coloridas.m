@@ -4,21 +4,26 @@
 
 function coloridas 
   p = 500
-  r = ones(p);
-  g = ones(p);
-  b = ones(p);
+  r = ones(p, 'uint8');
+  g = ones(p, 'uint8');
+  b = ones(p, 'uint8');
   
   for x = 1:p
     for y = 1:p
       
-      g(x,y) = (255-x-y);
-      r(x,y) = 255 - x + y;
-      b(x,y) = 500 - x - y;
+      
+      
+      
+      %g(x,y) = (255-x-y);
+      %r(x,y) = 255 - x + y;
+      %b(x,y) = 500 - x - y;
+      
+      
     endfor
   endfor
   
   img = cat (3, r, g, b);
   imshow (img);
-  imwrite (img, 'cor_5.png', 'Quality', 100);
+  imwrite (img, 'cor_1.png', 'Quality', 100);
 
 endfunction
