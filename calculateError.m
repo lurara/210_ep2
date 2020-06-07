@@ -19,6 +19,7 @@ function calculateError(originalImg, decompressedImg)
   decG = decompressed(:,:,2);
   decB = decompressed(:,:,3);
   
+  % Considera apenas o "quadrado" da imagem
   if(org_width > org_height)
     org_size = org_height;
     
@@ -28,7 +29,7 @@ function calculateError(originalImg, decompressedImg)
       origB = origB(1:end-1, 1:end);
       
       [org_width, org_height] = size(origR);
-    
+      
     endwhile
     
   else
