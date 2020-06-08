@@ -4,7 +4,7 @@
 % preto_2: 255*sin(x)*sin(y)
 % novo_preto_3 : 255*sin(xy)
 % preto_4: 255*sin(x)
-function teste_3 (p)
+function copia (p)
   r = ones(p, 'uint8');
   g = ones(p, 'uint8');
   b = ones(p, 'uint8');

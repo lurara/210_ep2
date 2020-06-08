@@ -184,6 +184,8 @@ function compress (originalImg, k)
        
   else  % NÃO RGB
        
+    %if(teto)   
+    
     l = 1; % indica a linha na matriz original 
     c = 1; % indica a coluna
     
