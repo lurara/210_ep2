@@ -15,3 +15,29 @@ tarsila_gray e bilinear: err =  0.048596
 tarsila_gray e bicubica: err =  0.051009
 
 ****************************************
+
+tarsila e bicubica: err =  0.052251
+tarsila e bilinear: err =  0.050520
+
+****************************************
+
+pretob = r(x,y) = g(x,y) = b(x,y) = (3*y*y + x)
+pretob e bicubica: err =  0.0039840
+pretob e bilinear: err =  0.0036113
+
+****************************************
+
+pretoa =  r(x,y) = g(x,y) = b(x,y) = (x*y)
+pretoa e bicubica: err = 7.1348e-04
+pretoa e bilinear: err = 0.0010856
+
+****************************************
+
+cor_0_gray e bicubica: err =    8.7623e-04
+cor_0_gray e bilinear: err =    8.5537e-04
+
+*****************************************
+
+cor2 e cor2_3k1_bic: err =  0.17818
+cor2 e cor2_3k1_bil: err =  0.17206
+

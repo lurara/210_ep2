@@ -59,7 +59,7 @@ function compress (originalImg, k)
   teto = false;
   
   # Condição para pegar a última linha e última coluna 
-  if(n + (n - 1)*k < img_p && ehRGB) % SÓ VALE PARA RGB, ARRUMAR DPS
+  if(n + (n - 1)*k < img_p) % SÓ VALE PARA RGB
     n++;  # n teto
     teto = true;
   endif
@@ -183,26 +183,55 @@ function compress (originalImg, k)
     imwrite(new_img, 'compressed.png', 'Quality', 100);
        
   else  % NÃO RGB
-       
-    %if(teto)   
-    
-    l = 1; % indica a linha na matriz original 
-    c = 1; % indica a coluna
-    
-    % percorremos as linhas da nova imagem
-    for i = 1:1:n
-      % percorremos também as colunas dessa nova imagem    
-      for j = 1:1:n
-        
-        new_img (i,j) = img(l,c);
-        c += k+1; % avançamos para o próximo múltiplo de k+1
-        
+    if(teto)   
+      l = c = 1;
+      
+      for i = 1:1:n-1
+        for j = 1:1:n-1
+          new_img(i,j) = img(l,c);
+          c += k+1;
+        endfor
+        l += k+1;
+        c = 1;
       endfor
       
-      l += k+1; % avançamos para a próxima linha
-      c = 1; % voltamos a coluna pro começo
+      %%%%% última linha da matriz %%%%%
       
-    endfor
+      l = c = 1;
+      
+      for i = 1:1:n-1
+        new_img (i,n) = img(l,img_p);
+        l += k+1;
+      endfor
+      
+      for j = 1:1:n-1
+        new_img (n, j) = img(img_p,c);
+        c += k+1;
+      endfor;
+      
+      new_img (n,n) = img(img_p, img_p);
+        
+    else
+      
+      l = 1; % indica a linha na matriz original 
+      c = 1; % indica a coluna
+      
+      % percorremos as linhas da nova imagem
+      for i = 1:1:n
+        % percorremos também as colunas dessa nova imagem    
+        for j = 1:1:n
+          
+          new_img (i,j) = img(l,c);
+          c += k+1; % avançamos para o próximo múltiplo de k+1
+          
+        endfor
+        
+        l += k+1; % avançamos para a próxima linha
+        c = 1; % voltamos a coluna pro começo
+        
+      endfor
+    
+    endif
     
     if(iscolormap(cmap))
       imwrite(new_img, cmap, 'compressed.png', 'Quality', 100);
